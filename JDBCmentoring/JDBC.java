@@ -21,22 +21,11 @@ public class JDBCmentoring {
             String dbURL = "jdbc:mysql://localhost:3306/sample";
             Connection connection = DriverManager.getConnection(dbURL, "root", "");
             
-            if(connection != null){
-                System.out.println("Connection established!");
-                
-                Statement statement = connection.createStatement();
-                ResultSet rs = statement.executeQuery("SELECT * FROM groupmates");
-                
-                while (rs.next()){
-                    int id = rs.getInt("id");
-                    String name = rs.getString("name");
-                    int age = rs.getInt("age");
-                    
-                    System.out.println(id + ": " + name + ", " + age);
-                }
-                
-                connection.close();
-            }
+           
+            addNewStudents(connection, 3,"louie",19);
+            addNewStudents(connection, 5,"louie",19);
+            printAllStudents(connection);
+            connection.close();
             
         }catch(ClassNotFoundException e){
             System.out.println("Cannot load Driver");
@@ -44,5 +33,37 @@ public class JDBCmentoring {
             System.out.println(e.getMessage());
         }
     }
+
+    public static void printAllStudents(Connection connection) throws SQLException {
+        if(connection != null){
+            System.out.println("Connection established!");
+            
+            Statement statement = connection.createStatement();
+            ResultSet rs = statement.executeQuery("SELECT * FROM groupmates");
+            
+            while (rs.next()){
+                int id = rs.getInt("id");
+                String name = rs.getString("name");
+                int age = rs.getInt("age");
+                
+                System.out.println(id + ": " + name + ", " + age);
+            }
+        }
+    }
+    
+     public static void addNewStudents(Connection connection, int id, String name, int age) throws SQLException {
+         PreparedStatement statement =  connection.prepareStatement("INSERT INTO groupmates VALUES (?, ?, ?)");
+         
+         statement.setInt(1, id);
+         statement.setString(2, name);
+         statement.setInt(3, age);
+         
+         int nb = statement.executeUpdate();
+         if (nb > 0){
+             System.out.println("Inserted " + nb + " rows");
+         }else{
+             System.out.println("Not inserted");
+         }
+     }
 
 }
